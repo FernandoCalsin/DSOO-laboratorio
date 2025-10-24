@@ -51,6 +51,8 @@ public class Soldado {
     public int getColumna() { return columna; }
     public int getEjercito() { return ejercito; }
     public boolean estaVivo() { return vive; }
+    public int getNivelDefensa() {return nivelDefensa;}
+    public void setNivelDefensa(int nivelDefensa) {this.nivelDefensa = nivelDefensa;}
 
     //comportamiento de soldado
     public void atacar() {

@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class VideoJuego3 {
 
     public static void main(String[] args) {
-        // 1. Inicialización del juego
+ 
         int dimensionTablero = 10;
         Tablero tablero = new Tablero(dimensionTablero);
         Random random = new Random();
@@ -21,15 +21,14 @@ public class VideoJuego3 {
         crearEjercito(ejercito1, 1, numSoldados1, tablero, dimensionTablero);
         crearEjercito(ejercito2, 2, numSoldados2, tablero, dimensionTablero);
         
-        // 2. Mostrar estado inicial
+   
         tablero.imprimirTablero();
         System.out.println("\n     REPORTE INICIAL DE EJÉRCITOS     ");
         System.out.println("\n    EJÉRCITO 1 ($)    ");
         reporteEjercito(ejercito1);
         System.out.println("\n   EJÉRCITO 2 (#)   ");
         reporteEjercito(ejercito2);
-        
-        // 3. Inicia el Bucle del Juego Interactivo
+      
         Scanner sc = new Scanner(System.in);
         int turno = 1;
 
@@ -40,8 +39,6 @@ public class VideoJuego3 {
             Soldado soldadoAMover = null;
             int filaOrigen = -1, colOrigen = -1;
             boolean datosValidos = false;
-
-            // Bucle para validar la selección del soldado
             while (!datosValidos) {
                 System.out.print("Ingrese la fila del soldado a mover: ");
                 filaOrigen = sc.nextInt();
@@ -61,8 +58,6 @@ public class VideoJuego3 {
                     datosValidos = true;
                 }
             }
-
-            // Bucle para validar el movimiento
             datosValidos = false;
             while (!datosValidos) {
                 System.out.print("Mover hacia (W/A/S/D): ");
@@ -80,46 +75,54 @@ public class VideoJuego3 {
                         System.out.println("Dirección no válida."); 
                         continue;
                 }
-
                 if (filaDestino < 0 || filaDestino >= dimensionTablero || colDestino < 0 || colDestino >= dimensionTablero) {
                     System.out.println("Error: Movimiento fuera del tablero.");
                     continue;
                 }
-
                 Soldado soldadoEnDestino = tablero.getSoldado(filaDestino, colDestino);
                 if (soldadoEnDestino != null && soldadoEnDestino.getEjercito() == turno) {
                     System.out.println("Error: No puedes moverte a una casilla ocupada por un aliado.");
                     continue;
                 }
-                
-                // Si el movimiento es válido, se ejecuta la acción
-                if (soldadoEnDestino == null) { // Movimiento a casilla vacía
+                if (soldadoEnDestino == null) {
                     tablero.moverSoldado(filaOrigen, colOrigen, filaDestino, colDestino);
                     System.out.println(soldadoAMover.getNombre() + " se ha movido.");
-                } else { // Hay un enemigo: ¡Batalla!
+                } else {
                     System.out.println("¡BATALLA! " + soldadoAMover.getNombre() + " vs " + soldadoEnDestino.getNombre());
-                    
-                    if (soldadoAMover.getVidaActual() >= soldadoEnDestino.getVidaActual()) {
-                        System.out.println("GANA " + soldadoAMover.getNombre());
+                    int vidaAtacante = soldadoAMover.getVidaActual();
+                    int vidaDefensor = soldadoEnDestino.getVidaActual();
+                    double vidaTotal = vidaAtacante + vidaDefensor;
+                    double probAtacante = (vidaAtacante / vidaTotal); 
+                    double probDefensor = (vidaDefensor / vidaTotal);
+                    System.out.printf("  Probabilidad %s (Vida: %d): %.1f%%\n",
+                    soldadoAMover.getNombre(), vidaAtacante, (probAtacante * 100));
+                    System.out.printf("  Probabilidad %s (Vida: %d): %.1f%%\n",
+                    soldadoEnDestino.getNombre(), vidaDefensor, (probDefensor * 100));
+                    double randomRoll = Math.random();
+                    System.out.printf("  Lanzamiento aleatorio: %.3f\n", randomRoll);
+                    if (randomRoll < probAtacante) {
+                        System.out.println("  -> GANA " + soldadoAMover.getNombre() +
+                        String.format(" (%.3f < %.3f)", randomRoll, probAtacante));
+                        soldadoAMover.setVidaActual(soldadoAMover.getVidaActual() + 1);
+                        System.out.println("  " + soldadoAMover.getNombre() + " aumenta su vida a " + soldadoAMover.getVidaActual());
                         soldadoEnDestino.morir();
                         (turno == 1 ? ejercito2 : ejercito1).remove(soldadoEnDestino);
                         tablero.moverSoldado(filaOrigen, colOrigen, filaDestino, colDestino);
-                    } else {
-                        System.out.println("GANA " + soldadoEnDestino.getNombre());
-                        soldadoAMover.morir();
-                        (turno == 1 ? ejercito1 : ejercito2).remove(soldadoAMover);
-                        tablero.removerSoldado(filaOrigen, colOrigen);
+                        } else {                        
+                            System.out.println("  -> GANA " + soldadoEnDestino.getNombre() +
+                            String.format(" (%.3f >= %.3f)", randomRoll, probAtacante));                    
+                            soldadoEnDestino.setVidaActual(soldadoEnDestino.getVidaActual() + 1);
+                            System.out.println("  " + soldadoEnDestino.getNombre() + " aumenta su vida a " + soldadoEnDestino.getVidaActual());
+                            soldadoAMover.morir();
+                            (turno == 1 ? ejercito1 : ejercito2).remove(soldadoAMover);                    
+                            tablero.removerSoldado(filaOrigen, colOrigen);
+                        }
                     }
-                }
                 datosValidos = true;
-            }
-            
-            // Mostrar estado y cambiar de turno
+            }   
             tablero.imprimirTablero();
             turno = (turno == 1) ? 2 : 1;
         }
-
-        // 4. Fin del juego
         System.out.println("\n  FIN DEL JUEGO  ");
         if (ejercito1.isEmpty()) {
             System.out.println("EL GANADOR ES EL JUGADOR 2");
@@ -128,8 +131,6 @@ public class VideoJuego3 {
         }
         sc.close();
     }
-    
-    // Los métodos de creación y reporte se mantienen igual, solo se ajusta el constructor
     public static void crearEjercito(ArrayList<Soldado> ejercito, int numEjercito, int cantidad, Tablero tablero, int dimension) {
         for (int i = 0; i < cantidad; i++) {
             int fila, columna;
