@@ -52,6 +52,7 @@ public class Soldado {
     public int getEjercito() { return ejercito; }
     public boolean estaVivo() { return vive; }
     public int getNivelDefensa() {return nivelDefensa;}
+    
     public void setNivelDefensa(int nivelDefensa) {this.nivelDefensa = nivelDefensa;}
 
     //comportamiento de soldado
@@ -105,11 +106,13 @@ public class Soldado {
 
     @Override
     public String toString() {
-        return "Soldado{" +
+        return getClass().getSimpleName() + "{" +
                 "nombre='" + nombre + '\'' +
                 ", ejercito=" + ejercito +
                 ", vida=" + vidaActual + "/" + nivelVida +
                 ", pos=(" + fila + "," + columna + ')' +
+                ", actitud=" + actitud +
+                ", vivo=" + vive +
                 '}';
-    }
+    }   
 }

@@ -2,6 +2,10 @@ public class Caballero extends Soldado {
     private boolean estaMontado;
     private String armaActual;
 
+    public Caballero(String nombre, int fila, int columna, int ejercito, int vida) {
+        super(nombre, fila, columna, ejercito);
+        setVidaActual(vida);
+    }
     public Caballero(String nombre, int fila, int columna, int ejercito) {
         super(nombre, fila, columna, ejercito);
         this.estaMontado = true;
@@ -60,5 +64,11 @@ public class Caballero extends Soldado {
 
     public String getArmaActual() {
         return armaActual;
+    }
+    @Override
+    public String toString() {
+        String base = super.toString();
+        base = base.substring(0, base.length() - 1); // eliminar la llave final '}'
+        return base + ", montado=" + estaMontado + ", arma='" + armaActual + "'}";
     }
 }

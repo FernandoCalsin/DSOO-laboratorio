@@ -2,8 +2,11 @@ import java.util.Random;
 public class Arquero extends Soldado {
 
     private int cantidadFlechas;
+    public Arquero(String nombre, int fila, int columna, int ejercito, int vida) {
+        super(nombre, fila, columna, ejercito);
+        setVidaActual(vida);
+    }    
     public Arquero(String nombre, int fila, int columna, int ejercito) {
-
         super(nombre, fila, columna, ejercito);
         Random rand = new Random();        
         this.cantidadFlechas = rand.nextInt(6) + 5; 
@@ -24,7 +27,6 @@ public class Arquero extends Soldado {
             this.cantidadFlechas--;
             System.out.println("¡" + getNombre() + " dispara una flecha!");
             System.out.println("  (Flechas restantes: " + this.cantidadFlechas + ")");
-
         } else {
             System.out.println("¡" + getNombre() + " no tiene más flechas!");
             defender(); 

@@ -1,6 +1,10 @@
 import java.util.Random;
 public class Espadachin extends Soldado {  
     private int longitudDeEspada;
+    public Espadachin(String nombre, int fila, int columna, int ejercito, int vida) {
+        super(nombre, fila, columna, ejercito);
+        setVidaActual(vida);
+    }
     public Espadachin(String nombre, int fila, int columna, int ejercito) {   
         super(nombre, fila, columna, ejercito); 
         Random rand = new Random();
@@ -22,5 +26,11 @@ public class Espadachin extends Soldado {
     }
     public int getLongitudDeEspada() {
         return longitudDeEspada;
+    }
+    @Override
+    public String toString() {
+        String base = super.toString();
+        base = base.substring(0, base.length() - 1);
+        return base + ", espada=" + longitudDeEspada + "}";
     }
 }

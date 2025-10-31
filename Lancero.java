@@ -1,13 +1,15 @@
 import java.util.Random;
 public class Lancero extends Soldado {
-
     private int longitudDeLanza;
+    public Lancero(String nombre, int fila, int columna, int ejercito, int vida) {
+        super(nombre, fila, columna, ejercito);
+        setVidaActual(vida);
+    }
     public Lancero(String nombre, int fila, int columna, int ejercito) {
         super(nombre, fila, columna, ejercito);
         Random rand = new Random();
         this.longitudDeLanza = rand.nextInt(4) + 2; 
     }
-
     public Lancero(int ejercito, int dimensionTablero) {
         super(ejercito, dimensionTablero);
         Random rand = new Random();
