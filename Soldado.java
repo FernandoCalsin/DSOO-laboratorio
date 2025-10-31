@@ -47,13 +47,20 @@ public class Soldado {
     public String getNombre() { return nombre; }
     public int getVidaActual() { return vidaActual; }
     public void setVidaActual(int vida) { this.vidaActual = vida; }
+
     public int getFila() { return fila; }
     public int getColumna() { return columna; }
     public int getEjercito() { return ejercito; }
     public boolean estaVivo() { return vive; }
-    public int getNivelDefensa() {return nivelDefensa;}
+
+    public void setNivelDefensa(int nivelDefensa){this.nivelDefensa=nivelDefensa;}
+    public void setNivelAtaque(int nivelAtaque){this.nivelAtaque=nivelAtaque;}
+    public void setNivelVida(int nivelVida){this.nivelVida=nivelVida;}
+
+    public int getNivelDefensa() {return this.nivelDefensa;}
+    public int getNivelAtaque(){return this.nivelAtaque;}
+    public int getNivelVida(){return this.nivelVida;}
     
-    public void setNivelDefensa(int nivelDefensa) {this.nivelDefensa = nivelDefensa;}
 
     //comportamiento de soldado
     public void atacar() {

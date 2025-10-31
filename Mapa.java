@@ -1,27 +1,24 @@
 import java.util.Random;
-
-public class Mapa {
+public class Mapa{
     private String tipoTerritorio;
     private Soldado[][] tablero;
     private Ejercito ejercito1;
     private Ejercito ejercito2;
     private int dimension;
 
-    public Mapa(int dimension) {
-        this.dimension = dimension;
-        this.tablero = new Soldado[dimension][dimension];
-        this.tipoTerritorio = generarTerritorio();
+    public Mapa(int dimension){
+        this.dimension=dimension;
+        this.tablero=new Soldado[dimension][dimension];
+        this.tipoTerritorio=generarTerritorio();
         inicializarEjercitos();
     }
-
-    private String generarTerritorio() {
-        String[] tipos = {"bosque", "campo abierto", "montaña", "desierto", "playa"};
+    private String generarTerritorio(){
+        String[] tipos={"bosque","campo abierto","montaña","desierto","playa"};
         return tipos[new Random().nextInt(tipos.length)];
     }
-
-    private void inicializarEjercitos() {
+    private void inicializarEjercitos(){
         ejercito1 = new Ejercito("Inglaterra");
-        ejercito2 = new Ejercito("Francia");
+        ejercito2 = new Ejercito2("Francia");
 
         ejercito1.generarSoldados(1, dimension);
         ejercito2.generarSoldados(2, dimension);
@@ -30,7 +27,6 @@ public class Mapa {
         colocarEjercitoEnMapa(ejercito2);
         aplicarBonusTerritorial();
     }
-
     private void colocarEjercitoEnMapa(Ejercito ejercito) {
         Random rand = new Random();
         for (Soldado s : ejercito.getSoldados()) {
@@ -68,4 +64,30 @@ public class Mapa {
 
     public Ejercito getEjercito1() { return ejercito1; }
     public Ejercito getEjercito2() { return ejercito2; }
+    public String getTipoTerritorio() {
+        return tipoTerritorio;
+    }
+    public void setTipoTerritorio(String tipoTerritorio) {
+        this.tipoTerritorio = tipoTerritorio;
+    }
+    public Soldado[][] getTablero() {
+        return tablero;
+    }
+    public void setTablero(Soldado[][] tablero) {
+        this.tablero = tablero;
+    }
+    public void setEjercito1(Ejercito ejercito1) {
+        this.ejercito1 = ejercito1;
+    }
+    public void setEjercito2(Ejercito ejercito2) {
+        this.ejercito2 = ejercito2;
+    }
+    public int getDimension() {
+        return dimension;
+    }
+    public void setDimension(int dimension) {
+        this.dimension = dimension;
+    }
+}
+
 }
