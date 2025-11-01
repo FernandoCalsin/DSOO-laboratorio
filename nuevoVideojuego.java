@@ -1,15 +1,13 @@
 import java.util.Random;
 
-public class VideoJuego3 {
+public class nuevoVideojuego {
     public static void main(String[] args) {
         Ejercito ejercito1 = new Ejercito("Inglaterra", 10);
         Ejercito ejercito2 = new Ejercito("Francia", 3);
-
-        // --- Mostrar datos detallados ---
+          
         mostrarDatos(ejercito1);
         mostrarDatos(ejercito2);
 
-        // --- Calcular probabilidades ---
         int vida1 = ejercito1.getVidaTotal();
         int vida2 = ejercito2.getVidaTotal();
         double totalVida = vida1 + vida2;
@@ -20,7 +18,6 @@ public class VideoJuego3 {
         System.out.printf("\nEjercito 1: %s: %d %.2f%% de probabilidad de victoria\n", ejercito1.getNombre(), vida1, prob1);
         System.out.printf("Ejercito 2: %s: %d %.2f%% de probabilidad de victoria\n", ejercito2.getNombre(), vida2, prob2);
 
-        // --- Simular batalla (aleatorio) ---
         Random random = new Random();
         double aleatorio = random.nextDouble() * 100;
         System.out.printf("\nNúmero aleatorio generado: %.2f\n", aleatorio);
