@@ -17,16 +17,14 @@ public class Mapa{
         return tipos[new Random().nextInt(tipos.length)];
     }
     private void inicializarEjercitos(){
-        ejercito1 = new Ejercito("Inglaterra");
-        ejercito2 = new Ejercito2("Francia");
-
-        ejercito1.generarSoldados(1, dimension);
-        ejercito2.generarSoldados(2, dimension);
+        ejercito1 = new Ejercito("Inglaterra", 10);
+        ejercito2 = new Ejercito("Francia", 10);
 
         colocarEjercitoEnMapa(ejercito1);
         colocarEjercitoEnMapa(ejercito2);
         aplicarBonusTerritorial();
     }
+
     private void colocarEjercitoEnMapa(Ejercito ejercito) {
         Random rand = new Random();
         for (Soldado s : ejercito.getSoldados()) {
@@ -41,11 +39,11 @@ public class Mapa{
 
     private void aplicarBonusTerritorial() {
         if (tipoTerritorio.equals("bosque")) {
-            if (ejercito1.getNombreReino().equals("Inglaterra")) {
+            if (ejercito1.getNombre().equals("Inglaterra")) {
                 for (Soldado s : ejercito1.getSoldados()) s.setVidaActual(s.getVidaActual() + 1);
             }
         } else if (tipoTerritorio.equals("campo abierto")) {
-            if (ejercito2.getNombreReino().equals("Francia")) {
+            if (ejercito2.getNombre().equals("Francia")) {
                 for (Soldado s : ejercito2.getSoldados()) s.setVidaActual(s.getVidaActual() + 1);
             }
         }
