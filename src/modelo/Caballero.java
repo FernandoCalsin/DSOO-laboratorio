@@ -1,3 +1,4 @@
+package modelo;
 public class Caballero extends Soldado {
     private boolean estaMontado;
     private String armaActual;

@@ -1,3 +1,4 @@
+package modelo;
 import java.util.Random;
 public class Espadachin extends Soldado {  
     private int longitudDeEspada;

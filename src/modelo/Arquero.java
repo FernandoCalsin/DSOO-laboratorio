@@ -1,3 +1,4 @@
+package modelo;
 import java.util.Random;
 public class Arquero extends Soldado {
 
@@ -42,4 +43,3 @@ public class Arquero extends Soldado {
         return infoSoldado + ", flechas=" + cantidadFlechas + '}';
     }
 }
-

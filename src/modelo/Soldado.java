@@ -1,5 +1,5 @@
+package modelo;
 import java.util.Random;
-
 public class Soldado {
     private String nombre;
     private int nivelAtaque;
@@ -9,13 +9,9 @@ public class Soldado {
     private int velocidad = 0;
     private String actitud = "Defensiva";
     private boolean vive = true;
-    
-    // Atributos de posición y equipo
     private int fila;
     private int columna;
     private int ejercito;
-
-    //Constructores Sobrecargados
 
     public Soldado(String nombre, int fila, int columna, int ejercito) {
         Random rand = new Random();
@@ -30,20 +26,17 @@ public class Soldado {
         this.vidaActual = this.nivelVida;
     }
 
-    // 2. Constructor para crear un soldado de un ejército en una posición aleatoria
     public Soldado(int ejercito, int dimensionTablero) {
         this("SoldadoDefault", 0, 0, ejercito);
         Random rand = new Random();      
         this.fila = rand.nextInt(dimensionTablero);
         this.columna = rand.nextInt(dimensionTablero);
     }
-    
-    //Constructor por defecto para un soldado del ejército 1 en (0,0)
+
     public Soldado() {
         this("SoldadoBase", 0, 0, 1);
     }
 
-    //  Getters y Setters 
     public String getNombre() { return nombre; }
     public int getVidaActual() { return vidaActual; }
     public void setVidaActual(int vida) { this.vidaActual = vida; }
@@ -60,9 +53,7 @@ public class Soldado {
     public int getNivelDefensa() {return this.nivelDefensa;}
     public int getNivelAtaque(){return this.nivelAtaque;}
     public int getNivelVida(){return this.nivelVida;}
-    
 
-    //comportamiento de soldado
     public void atacar() {
         this.actitud = "Ofensiva";
         avanzar();
@@ -103,8 +94,7 @@ public class Soldado {
         this.vidaActual = 0;
         System.out.println("¡" + this.nombre + " ha sido derrotado!");
     }
-    
-    // Método para actualizar las coordenadas internas del soldado
+
     public void mover(int nuevaFila, int nuevaColumna){
         this.fila = nuevaFila;
         this.columna = nuevaColumna;
@@ -121,5 +111,5 @@ public class Soldado {
                 ", actitud=" + actitud +
                 ", vivo=" + vive +
                 '}';
-    }   
+    }
 }
