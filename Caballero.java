@@ -61,7 +61,9 @@ public class Caballero extends Soldado {
     public boolean isEstaMontado() {
         return estaMontado;
     }
-
+    public boolean estaMontado() {
+        return this.estaMontado;
+    }
     public String getArmaActual() {
         return armaActual;
     }
