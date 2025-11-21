@@ -1,10 +1,9 @@
 package controlador;
 
+import java.util.Random;
+import javax.swing.*;
 import modelo.*;
 import vista.VistaJuego;
-
-import javax.swing.*;
-import java.util.Random;
 
 public class ControladorJuego {
 
@@ -69,7 +68,7 @@ public class ControladorJuego {
             do {
                 x = rand.nextInt(10);
                 y = rand.nextInt(10);
-            } while (!vista.isCeldaVacia(x,y)); // find empty cell
+            } while (!vista.isCeldaVacia(x,y));
 
             vista.setImagenCelda(x, y, obtenerImagenSoldado(s));
         }

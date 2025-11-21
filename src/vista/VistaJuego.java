@@ -121,7 +121,7 @@ public class VistaJuego extends JFrame {
                     .getResource("imagenes/" + nombre);
 
             if (url == null) {
-                System.out.println("❌ Imagen NO encontrada: " + nombre);
+                System.out.println("Imagen NO encontrada: " + nombre);
                 return null;
             }
 
@@ -131,7 +131,7 @@ public class VistaJuego extends JFrame {
             return new ImageIcon(img);
 
         } catch (Exception e) {
-            System.out.println("⚠ Error cargando imagen: " + nombre);
+            System.out.println("Error cargando imagen: " + nombre);
             return null;
         }
     }
