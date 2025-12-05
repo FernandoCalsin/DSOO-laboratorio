@@ -14,6 +14,12 @@ public class VistaJuego extends JFrame {
     private JMenuItem itemSalir;
     private JCheckBoxMenuItem itemMostrarConsola;
 
+    private JMenuItem itemNuevo;
+    private JMenuItem itemAbrirLogs;
+    private JMenuItem itemGuardarLogs;
+    private JMenuItem itemGuardarRanking;
+    private JMenuItem itemGuardarConfig;
+
     public VistaJuego() {
 
         setTitle("Simulador de Batalla - MVC");
@@ -31,14 +37,29 @@ public class VistaJuego extends JFrame {
         JMenuBar barra = new JMenuBar();
 
         JMenu archivo = new JMenu("Archivo");
+
+        itemNuevo = new JMenuItem("Nuevo");
         itemCompilar = new JMenuItem("Compilar soldados");
+
         JMenuItem itemGuardar = new JMenuItem("Guardar");
         JMenuItem itemAbrir = new JMenuItem("Abrir");
+
+        itemAbrirLogs = new JMenuItem("Abrir Logs");
+        itemGuardarLogs = new JMenuItem("Guardar Logs");
+        itemGuardarRanking = new JMenuItem("Guardar Ranking");
+        itemGuardarConfig = new JMenuItem("Guardar Configuración");
+
         itemSalir = new JMenuItem("Salir");
 
+        archivo.add(itemNuevo);
         archivo.add(itemCompilar);
         archivo.add(itemGuardar);
         archivo.add(itemAbrir);
+        archivo.addSeparator();
+        archivo.add(itemAbrirLogs);
+        archivo.add(itemGuardarLogs);
+        archivo.add(itemGuardarRanking);
+        archivo.add(itemGuardarConfig);
         archivo.addSeparator();
         archivo.add(itemSalir);
 
@@ -82,11 +103,20 @@ public class VistaJuego extends JFrame {
 
         add(scrollConsola);
     }
+    // Getters
+    public JMenuItem getItemNuevo() { return itemNuevo; }
+    public JMenuItem getItemAbrirLogs() { return itemAbrirLogs; }
+    public JMenuItem getItemGuardarLogs() { return itemGuardarLogs; }
+    public JMenuItem getItemGuardarRanking() { return itemGuardarRanking; }
+    public JMenuItem getItemGuardarConfig() { return itemGuardarConfig; }
 
     public JMenuItem getItemCompilar() { return itemCompilar; }
     public JMenuItem getItemSobre()   { return itemSobre; }
     public JMenuItem getItemSalir()   { return itemSalir; }
     public JCheckBoxMenuItem getItemMostrarConsola() { return itemMostrarConsola; }
+    public String getConsolaTexto() {return areaTexto.getText();}
+
+
 
     public void setImagenCelda(int x, int y, ImageIcon icon) {
         celdas[x][y].setIcon(icon);
@@ -116,7 +146,6 @@ public class VistaJuego extends JFrame {
 
     public ImageIcon cargarImagen(String nombre) {
         try {
-
             java.net.URL url = getClass().getClassLoader()
                     .getResource("imagenes/" + nombre);
 

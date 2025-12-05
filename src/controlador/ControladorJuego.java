@@ -1,11 +1,17 @@
 package controlador;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.util.Random;
 import javax.swing.*;
 import modelo.*;
+import vista.VistaArchivos;
 import vista.VistaJuego;
 
 public class ControladorJuego {
+
+    private final String RUTA_DATA = "data";
 
     private VistaJuego vista;
     private Random rand = new Random();
@@ -19,9 +25,16 @@ public class ControladorJuego {
     public ControladorJuego(VistaJuego vista) {
         this.vista = vista;
 
+        System.out.println("RUTA USADA PARA DATA = " + RUTA_DATA);
+        crearCarpetaData();
         cargarImagenes();
         agregarEventos();
     }
+    private void crearCarpetaData() {
+        File carpeta = new File(RUTA_DATA);
+        if (!carpeta.exists()) carpeta.mkdir();
+    }
+
 
     private void cargarImagenes() {
         imgArquero = vista.cargarImagen("arquero.png");
@@ -30,19 +43,83 @@ public class ControladorJuego {
         imgCabMontado = vista.cargarImagen("caballero_montado.png");
         imgCabDesmontado = vista.cargarImagen("caballero_desmontado.png");
     }
-
+ 
     private void agregarEventos() {
 
         vista.getItemCompilar().addActionListener(e -> generarEjercitos());
-
         vista.getItemSalir().addActionListener(e -> System.exit(0));
+        vista.getItemSobre().addActionListener(e ->vista.mostrarMensaje("Simulador de Batalla\nCreado por Luis :D"));
+        vista.getItemMostrarConsola().addActionListener(e -> vista.toggleConsola());
 
-        vista.getItemSobre().addActionListener(e ->
-                vista.mostrarMensaje("Simulador de Batalla\nCreado por Luis :D"));
+        vista.getItemNuevo().addActionListener(e -> nuevoJuego());
+        vista.getItemGuardarLogs().addActionListener(e -> guardarLogs());
+        vista.getItemAbrirLogs().addActionListener(e -> abrirArchivo("logs.txt"));
+        vista.getItemGuardarRanking().addActionListener(e -> guardarRanking());
+        vista.getItemGuardarConfig().addActionListener(e -> guardarConfig());
+    }
+    
+    private void guardarLogs() {
+    try {
+        FileWriter fw = new FileWriter(RUTA_DATA + "/logs.txt");
+        fw.write(vista.getConsolaTexto());
+        fw.close();
+        vista.mostrarMensaje("Logs guardados correctamente.");
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error guardando logs.");
+            e.printStackTrace();
+        }
+    }
 
-        vista.getItemMostrarConsola().addActionListener(
-                e -> vista.toggleConsola()
-        );
+
+    private void guardarRanking() {
+        try {
+            FileWriter fw = new FileWriter(RUTA_DATA + "/ranking.txt");
+            fw.write("Ranking de Jugadores\n");
+            fw.write("Jugador1 - 150 pts\n");
+            fw.write("Jugador2 - 90 pts\n");
+            fw.close();
+            vista.mostrarMensaje("Ranking guardado.");
+        } catch (Exception e) {
+            vista.mostrarMensaje("No se pudo guardar ranking.");
+            e.printStackTrace();
+        }
+    }
+
+    private void guardarConfig() {
+        try {
+            FileWriter fw = new FileWriter(RUTA_DATA + "/config.txt");
+            fw.write("mostrarConsola=" + vista.getItemMostrarConsola().isSelected());
+            fw.close();
+            vista.mostrarMensaje("Configuración guardada.");
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error guardando configuración.");
+            e.printStackTrace();
+        }
+    }
+
+   
+    private void abrirArchivo(String nombre) {
+        try {
+            File file = new File(RUTA_DATA + "/" + nombre);
+
+            if (!file.exists()) {
+                vista.mostrarMensaje("El archivo no existe.");
+                return;
+            }
+
+            String contenido = new String(Files.readAllBytes(file.toPath()));
+            new VistaArchivos("Visualizando " + nombre, contenido);
+
+        } catch (Exception e) {
+            vista.mostrarMensaje("Error al abrir archivo.");
+            e.printStackTrace();
+        }
+    }
+
+    private void nuevoJuego() {
+        vista.limpiarTablero();
+        vista.setConsolaTexto("");
+        vista.mostrarMensaje("Juego reiniciado.");
     }
 
     public void generarEjercitos() {
@@ -61,14 +138,14 @@ public class ControladorJuego {
 
         vista.setConsolaTexto(sb.toString());
     }
-
+ 
     private void colocarSoldadosEnTablero(Ejercito ej) {
         for (Soldado s : ej.getSoldados()) {
             int x, y;
             do {
                 x = rand.nextInt(10);
                 y = rand.nextInt(10);
-            } while (!vista.isCeldaVacia(x,y));
+            } while (!vista.isCeldaVacia(x, y));
 
             vista.setImagenCelda(x, y, obtenerImagenSoldado(s));
         }
@@ -108,7 +185,6 @@ public class ControladorJuego {
                     s.getNivelDefensa()
             ));
         }
-
         sb.append("==============================\n");
         return sb.toString();
     }
