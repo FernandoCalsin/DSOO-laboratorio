@@ -1,6 +1,7 @@
 package modelo;
+import java.io.Serializable;
 import java.util.Random;
-public class Espadachin extends Soldado {  
+public class Espadachin extends Soldado implements Serializable{  
     private int longitudDeEspada;
     public Espadachin(String nombre, int fila, int columna, int ejercito, int vida) {
         super(nombre, fila, columna, ejercito);

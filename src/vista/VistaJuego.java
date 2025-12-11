@@ -19,6 +19,14 @@ public class VistaJuego extends JFrame {
     private JMenuItem itemGuardarLogs;
     private JMenuItem itemGuardarRanking;
     private JMenuItem itemGuardarConfig;
+    
+    private JMenuItem itemGuardarBinario;
+    private JMenuItem itemAbrirBinario;
+
+
+
+    private JPanel panelTablero = new JPanel();
+
 
     public VistaJuego() {
 
@@ -49,6 +57,9 @@ public class VistaJuego extends JFrame {
         itemGuardarRanking = new JMenuItem("Guardar Ranking");
         itemGuardarConfig = new JMenuItem("Guardar Configuración");
 
+        itemGuardarBinario = new JMenuItem("Guardar Binario");
+        itemAbrirBinario = new JMenuItem("Abrir Binario");
+
         itemSalir = new JMenuItem("Salir");
 
         archivo.add(itemNuevo);
@@ -60,8 +71,13 @@ public class VistaJuego extends JFrame {
         archivo.add(itemGuardarLogs);
         archivo.add(itemGuardarRanking);
         archivo.add(itemGuardarConfig);
+        archivo.addSeparator();        
+
+        archivo.add(itemGuardarBinario);
+        archivo.add(itemAbrirBinario);
         archivo.addSeparator();
         archivo.add(itemSalir);
+
 
         JMenu ver = new JMenu("Ver");
         itemMostrarConsola = new JCheckBoxMenuItem("Mostrar consola", true);
@@ -79,20 +95,25 @@ public class VistaJuego extends JFrame {
     }
 
     private void crearTablero() {
-        JPanel tablero = new JPanel();
-        tablero.setLayout(new GridLayout(10, 10));
-        tablero.setBounds(20, 20, 520, 520);
-
+        panelTablero.setLayout(new GridLayout(10, 10));
+        panelTablero.setBounds(20, 20, 520, 520);
+        panelTablero.setOpaque(true);
+        panelTablero.setBackground(Color.WHITE);
+        panelTablero.removeAll();
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 celdas[i][j] = new JLabel();
                 celdas[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 celdas[i][j].setHorizontalAlignment(JLabel.CENTER);
-                tablero.add(celdas[i][j]);
+                panelTablero.add(celdas[i][j]);
             }
         }
-        add(tablero);
+        add(panelTablero);
+        panelTablero.revalidate();
+        panelTablero.repaint();
     }
+
+
 
     private void crearConsola() {
         areaTexto = new JTextArea();
@@ -116,6 +137,8 @@ public class VistaJuego extends JFrame {
     public JCheckBoxMenuItem getItemMostrarConsola() { return itemMostrarConsola; }
     public String getConsolaTexto() {return areaTexto.getText();}
 
+    public JMenuItem getItemGuardarBinario() {return itemGuardarBinario;}
+    public JMenuItem getItemAbrirBinario() {return itemAbrirBinario;}
 
 
     public void setImagenCelda(int x, int y, ImageIcon icon) {

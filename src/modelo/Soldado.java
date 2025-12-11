@@ -1,6 +1,7 @@
 package modelo;
+import java.io.Serializable;
 import java.util.Random;
-public class Soldado {
+public class Soldado implements Serializable{
     private String nombre;
     private int nivelAtaque;
     private int nivelDefensa;

@@ -1,7 +1,8 @@
 package modelo;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
-public class Ejercito {
+public class Ejercito implements Serializable{
     private String nombre;
     private ArrayList<Soldado> soldados = new ArrayList<>();
     public Ejercito(String nombre, int cantidad) {

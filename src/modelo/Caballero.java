@@ -1,5 +1,8 @@
 package modelo;
-public class Caballero extends Soldado {
+
+import java.io.Serializable;
+
+public class Caballero extends Soldado implements Serializable{
     private boolean estaMontado;
     private String armaActual;
 
