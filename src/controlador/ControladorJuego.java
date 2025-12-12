@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,15 +39,41 @@ public class ControladorJuego {
 
     private Soldado soldadoSeleccionado = null;
 
-    public void seleccionarSoldado(int fila, int columna) {
-        for (Soldado s : listaSoldados) {
-            if (s.getFila() == fila && s.getColumna() == columna) {
-                soldadoSeleccionado = s;
-                vista.mostrarMensaje("Soldado seleccionado: " + s.getNombre());
+    private ControladorJuego controlador;
+    public void setControlador(ControladorJuego controlador) {this.controlador = controlador;}
+
+
+   public void seleccionarSoldado(int fila, int columna) {
+    for (Soldado s : listaSoldados) {
+        if (s.getFila() == fila && s.getColumna() == columna) {
+            soldadoSeleccionado = s;
+            
+            String stats = String.format(
+                "=== SOLDADO SELECCIONADO ===\n" +
+                "Nombre: %s\n" +
+                "Tipo: %s\n" +
+                "Ejército: %d\n" +
+                "Vida actual: %d\n" +
+                "Ataque: %d\n" +
+                "Defensa: %d\n" +
+                "Fila: %d, Columna: %d\n" +
+                "=============================\n",
+                s.getNombre(),
+                s.getClass().getSimpleName(),
+                s.getEjercito(),
+                s.getVidaActual(),
+                s.getNivelAtaque(),
+                s.getNivelDefensa(),
+                s.getFila(),
+                s.getColumna()
+            );
+            vista.setConsolaTexto(vista.getConsolaTexto() + "\n" + stats);    
+            vista.resaltarCelda(fila, columna);
+
                 return;
             }
-        }
-        vista.mostrarMensaje("No hay soldado en esa posición.");
+        }   
+        vista.setConsolaTexto(vista.getConsolaTexto() + "\nNo hay soldado en esa posición.");
     }
 
     private void mover(int df, int dc) {
@@ -119,7 +147,7 @@ public class ControladorJuego {
         crearCarpetaData();
         cargarImagenes();
         agregarEventos();
-        vista.crearPanelControles();
+        
     }
 
     private void crearCarpetaData() {
@@ -150,6 +178,11 @@ public class ControladorJuego {
         vista.getItemGuardarBinario().addActionListener(e -> guardarBinario(listaSoldados));
         vista.getItemAbrirBinario().addActionListener(e -> abrirBinario());
 
+        vista.getItemGuardarRanking().addActionListener(e -> guardarRankingBD());
+        vista.getItemMostrarRankingBD().addActionListener(e -> mostrarRankingBD());
+
+
+
         vista.getBtnArriba().addActionListener(e -> moverSoldado(0, -1));
         vista.getBtnAbajo().addActionListener(e -> moverSoldado(0, 1));
         vista.getBtnIzquierda().addActionListener(e -> moverSoldado(-1, 0));
@@ -158,6 +191,49 @@ public class ControladorJuego {
 
 
     }
+
+    private void mostrarRankingBD() {
+        try (Connection conn = ConexionBD.getConexion()) {
+            String sql = "SELECT jugador, puntos FROM ranking ORDER BY puntos DESC";
+            var st = conn.createStatement();
+            var rs = st.executeQuery(sql);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("=== RANKING JUGADORES ===\n");
+            while (rs.next()) {
+                sb.append(rs.getString("jugador"))
+                .append(" - ")
+                .append(rs.getInt("puntos"))
+                .append(" pts\n");
+            }
+            vista.setConsolaTexto(sb.toString());
+        } catch (Exception e) {
+    e.printStackTrace(); // para ver el error completo en consola
+    vista.setConsolaTexto(vista.getConsolaTexto() +
+        "\nError mostrando ranking: " + e.toString());
+}
+
+    }
+
+public void guardarRankingBD() {
+    try (Connection conn = ConexionBD.getConexion()) {
+        String sql = "INSERT INTO ranking (jugador, puntos) VALUES (?, ?)";
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        // Aquí recorres tus soldados y guardas los que quieras
+        for (Soldado s : listaSoldados) {
+            ps.setString(1, s.getNombre());
+            ps.setInt(2, s.getPuntos());
+            ps.addBatch(); // para ejecutar en lote
+        }
+
+        ps.executeBatch(); // ejecuta todos los inserts
+        vista.setConsolaTexto(vista.getConsolaTexto() + "\nRanking guardado en la base de datos.");
+    } catch (Exception e) {
+        vista.setConsolaTexto(vista.getConsolaTexto() + "\nError guardando ranking en BD: " + e.getMessage());
+    }
+}
+
 
     public void guardarBinario(Object datos) {
         JFileChooser chooser = new JFileChooser();
@@ -221,7 +297,8 @@ public class ControladorJuego {
                     ));
                 }
                 sb.append("==============================\n");
-                vista.setConsolaTexto(sb.toString());
+                String stats = null;
+                vista.setConsolaTexto(vista.getConsolaTexto() + "\n" + stats);
                 JOptionPane.showMessageDialog(null, "Datos cargados correctamente.");
 
             } catch (Exception e) {
@@ -277,7 +354,6 @@ public class ControladorJuego {
                 vista.mostrarMensaje("El archivo no existe.");
                 return;
             }
-
             String contenido = new String(Files.readAllBytes(file.toPath()));
             new VistaArchivos("Visualizando " + nombre, contenido);
 
@@ -292,6 +368,7 @@ public class ControladorJuego {
         vista.setConsolaTexto("");
         vista.mostrarMensaje("Juego reiniciado.");
     }
+
     public void generarEjercitos() {
         vista.limpiarTablero();
 
@@ -338,7 +415,7 @@ public class ControladorJuego {
             s.setColumna(y);
         }
     }
-    
+
     private ImageIcon obtenerImagenSoldado(Soldado s) {
         if (s == null) return null;
         ImageIcon base = null;

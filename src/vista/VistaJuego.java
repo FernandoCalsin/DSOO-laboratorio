@@ -1,5 +1,6 @@
 package vista;
 
+import controlador.ControladorJuego;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -32,9 +33,15 @@ public class VistaJuego extends JFrame {
     private JButton btnDerecha;
     private JButton btnAtacar;
 
-    private JPanel panelTablero = new JPanel();    
-
+    private JPanel panelTablero = new JPanel();
     private JPanel panelDerecha;
+
+    private ControladorJuego controlador;
+
+    private int filaSeleccionada = -1;
+    private int colSeleccionada = -1;
+
+    private JMenuItem itemMostrarRankingBD;
 
     public VistaJuego() {
         setTitle("Simulador de Batalla - MVC");
@@ -49,7 +56,6 @@ public class VistaJuego extends JFrame {
 
         setVisible(true);
     }
-
 
     public void crearPanelControles() {
         JPanel panel = new JPanel();
@@ -75,25 +81,30 @@ public class VistaJuego extends JFrame {
 
         panelDerecha.add(panel, BorderLayout.SOUTH);
     }
+
+    public void resaltarCelda(int fila, int col) {
+        if (filaSeleccionada != -1 && colSeleccionada != -1) {
+            celdas[filaSeleccionada][colSeleccionada].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        }    
+        celdas[fila][col].setBorder(BorderFactory.createLineBorder(Color.YELLOW, 3));
+        filaSeleccionada = fila;
+        colSeleccionada = col;
+    }
+
     private void crearMenu() {
         JMenuBar barra = new JMenuBar();
 
         JMenu archivo = new JMenu("Archivo");
-
         itemNuevo = new JMenuItem("Nuevo");
         itemCompilar = new JMenuItem("Compilar soldados");
-
         JMenuItem itemGuardar = new JMenuItem("Guardar");
         JMenuItem itemAbrir = new JMenuItem("Abrir");
-
         itemAbrirLogs = new JMenuItem("Abrir Logs");
         itemGuardarLogs = new JMenuItem("Guardar Logs");
         itemGuardarRanking = new JMenuItem("Guardar Ranking");
         itemGuardarConfig = new JMenuItem("Guardar Configuración");
-
         itemGuardarBinario = new JMenuItem("Guardar Binario");
         itemAbrirBinario = new JMenuItem("Abrir Binario");
-
         itemSalir = new JMenuItem("Salir");
 
         archivo.add(itemNuevo);
@@ -105,8 +116,7 @@ public class VistaJuego extends JFrame {
         archivo.add(itemGuardarLogs);
         archivo.add(itemGuardarRanking);
         archivo.add(itemGuardarConfig);
-        archivo.addSeparator();        
-
+        archivo.addSeparator();
         archivo.add(itemGuardarBinario);
         archivo.add(itemAbrirBinario);
         archivo.addSeparator();
@@ -114,7 +124,9 @@ public class VistaJuego extends JFrame {
 
         JMenu ver = new JMenu("Ver");
         itemMostrarConsola = new JCheckBoxMenuItem("Mostrar consola", true);
+        itemMostrarRankingBD = new JMenuItem("Ranking BD"); // ✅ aquí lo integras
         ver.add(itemMostrarConsola);
+        ver.add(itemMostrarRankingBD);
 
         JMenu ayuda = new JMenu("Ayuda");
         itemSobre = new JMenuItem("Sobre el juego");
@@ -126,6 +138,7 @@ public class VistaJuego extends JFrame {
 
         setJMenuBar(barra);
     }
+
 
     public ImageIcon tintarImagen(ImageIcon icon, Color color) {
         int w = icon.getIconWidth();
@@ -154,13 +167,29 @@ public class VistaJuego extends JFrame {
                 celdas[i][j] = new JLabel();
                 celdas[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 celdas[i][j].setHorizontalAlignment(JLabel.CENTER);
+
+                final int fila = i;
+                final int col = j;
+                celdas[i][j].addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        if (controlador != null) {
+                            controlador.seleccionarSoldado(fila, col);
+                            celdas[fila][col].setBorder(
+                                BorderFactory.createLineBorder(Color.YELLOW, 3)
+                            );
+                        }
+                    }
+                });
+
                 panelTablero.add(celdas[i][j]);
             }
         }  
         add(panelTablero, BorderLayout.CENTER);
     }
 
-   public void actualizarTablero(ArrayList<Soldado> ejercito1, ArrayList<Soldado> ejercito2,
+ 
+    public void actualizarTablero(ArrayList<Soldado> ejercito1, ArrayList<Soldado> ejercito2,
                               java.util.Map<Soldado, ImageIcon> imagenes) {
 
         for (int i = 0; i < 10; i++) {
@@ -231,6 +260,9 @@ public class VistaJuego extends JFrame {
     public JButton getBtnDerecha() { return btnDerecha; }    
     public JButton getBtnAtacar() { return btnAtacar; }
 
+    public void setControlador(ControladorJuego c) {this.controlador = c;}
+
+    public JMenuItem getItemMostrarRankingBD() {return itemMostrarRankingBD;}
 
     public void setImagenCelda(int x, int y, ImageIcon icon) {
         celdas[x][y].setIcon(icon);

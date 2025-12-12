@@ -13,9 +13,10 @@ public class Soldado implements Serializable{
     private int fila;
     private int columna;
     private int ejercito;
+    private int puntos;
     
 
-
+    
     public Soldado(String nombre, int fila, int columna, int ejercito) {
         Random rand = new Random();
         this.nombre = nombre;
@@ -109,6 +110,14 @@ public class Soldado implements Serializable{
         this.columna = nuevaColumna;
         avanzar();
     }
+    public int getPuntos() {return puntos;}
+
+    public void setPuntos(int puntos) {this.puntos = puntos;}
+
+    public void agregarPuntos(int cantidad) {
+        this.puntos += cantidad;
+    }
+
 
     @Override
     public String toString() {
