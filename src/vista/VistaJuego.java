@@ -1,7 +1,10 @@
 package vista;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import javax.swing.*;
+import modelo.Soldado;
 
 public class VistaJuego extends JFrame {
 
@@ -22,25 +25,56 @@ public class VistaJuego extends JFrame {
     
     private JMenuItem itemGuardarBinario;
     private JMenuItem itemAbrirBinario;
+    
+    private JButton btnArriba;
+    private JButton btnAbajo;
+    private JButton btnIzquierda;
+    private JButton btnDerecha;
+    private JButton btnAtacar;
 
+    private JPanel panelTablero = new JPanel();    
 
-
-    private JPanel panelTablero = new JPanel();
-
+    private JPanel panelDerecha;
 
     public VistaJuego() {
-
         setTitle("Simulador de Batalla - MVC");
         setSize(900, 700);
-        setLayout(null);
+        setLayout(new BorderLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         crearMenu();
         crearTablero();
         crearConsola();
+        crearPanelControles();
+
         setVisible(true);
     }
 
+
+    public void crearPanelControles() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(3, 3, 5, 5));
+
+        btnArriba = new JButton("↑");
+        btnAbajo = new JButton("↓");
+        btnIzquierda = new JButton("←");
+        btnDerecha = new JButton("→");
+        btnAtacar = new JButton("Atacar");
+
+        panel.add(new JLabel(""));
+        panel.add(btnArriba);
+        panel.add(new JLabel(""));
+
+        panel.add(btnIzquierda);
+        panel.add(btnAtacar);
+        panel.add(btnDerecha);
+
+        panel.add(new JLabel(""));
+        panel.add(btnAbajo);
+        panel.add(new JLabel(""));
+
+        panelDerecha.add(panel, BorderLayout.SOUTH);
+    }
     private void crearMenu() {
         JMenuBar barra = new JMenuBar();
 
@@ -78,7 +112,6 @@ public class VistaJuego extends JFrame {
         archivo.addSeparator();
         archivo.add(itemSalir);
 
-
         JMenu ver = new JMenu("Ver");
         itemMostrarConsola = new JCheckBoxMenuItem("Mostrar consola", true);
         ver.add(itemMostrarConsola);
@@ -94,12 +127,28 @@ public class VistaJuego extends JFrame {
         setJMenuBar(barra);
     }
 
+    public ImageIcon tintarImagen(ImageIcon icon, Color color) {
+        int w = icon.getIconWidth();
+        int h = icon.getIconHeight();
+
+        BufferedImage buffer = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = buffer.createGraphics();
+
+        g.drawImage(icon.getImage(), 0, 0, null);
+
+        g.setComposite(AlphaComposite.SrcAtop);
+        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 120));
+        g.fillRect(0, 0, w, h);
+
+        g.dispose();
+        return new ImageIcon(buffer);
+    }
+
     private void crearTablero() {
+        panelTablero = new JPanel();
         panelTablero.setLayout(new GridLayout(10, 10));
-        panelTablero.setBounds(20, 20, 520, 520);
-        panelTablero.setOpaque(true);
         panelTablero.setBackground(Color.WHITE);
-        panelTablero.removeAll();
+
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 celdas[i][j] = new JLabel();
@@ -107,23 +156,59 @@ public class VistaJuego extends JFrame {
                 celdas[i][j].setHorizontalAlignment(JLabel.CENTER);
                 panelTablero.add(celdas[i][j]);
             }
+        }  
+        add(panelTablero, BorderLayout.CENTER);
+    }
+
+   public void actualizarTablero(ArrayList<Soldado> ejercito1, ArrayList<Soldado> ejercito2,
+                              java.util.Map<Soldado, ImageIcon> imagenes) {
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                celdas[i][j].setIcon(null);
+                celdas[i][j].setOpaque(false);
+                celdas[i][j].setBackground(null);
+            }
         }
-        add(panelTablero);
+
+        for (Soldado s : ejercito1) {
+            ImageIcon img = imagenes.get(s);
+            if (img != null) {
+                int f = s.getFila();
+                int c = s.getColumna();
+                celdas[f][c].setIcon(img);
+                celdas[f][c].setOpaque(true);
+            }
+        }
+
+        for (Soldado s : ejercito2) {
+            ImageIcon img = imagenes.get(s);
+            if (img != null) {
+                int f = s.getFila();
+                int c = s.getColumna();
+                celdas[f][c].setIcon(img);
+                celdas[f][c].setOpaque(true);
+            }
+        }
+
         panelTablero.revalidate();
         panelTablero.repaint();
     }
-
-
 
     private void crearConsola() {
         areaTexto = new JTextArea();
         areaTexto.setEditable(false);
 
         scrollConsola = new JScrollPane(areaTexto);
-        scrollConsola.setBounds(560, 20, 300, 520);
 
-        add(scrollConsola);
+        panelDerecha = new JPanel();
+        panelDerecha.setLayout(new BorderLayout());
+
+        panelDerecha.add(scrollConsola, BorderLayout.CENTER);
+
+        add(panelDerecha, BorderLayout.EAST);
     }
+
     // Getters
     public JMenuItem getItemNuevo() { return itemNuevo; }
     public JMenuItem getItemAbrirLogs() { return itemAbrirLogs; }
@@ -140,6 +225,12 @@ public class VistaJuego extends JFrame {
     public JMenuItem getItemGuardarBinario() {return itemGuardarBinario;}
     public JMenuItem getItemAbrirBinario() {return itemAbrirBinario;}
 
+    public JButton getBtnArriba() { return btnArriba; }
+    public JButton getBtnAbajo() { return btnAbajo; }
+    public JButton getBtnIzquierda() { return btnIzquierda; }
+    public JButton getBtnDerecha() { return btnDerecha; }    
+    public JButton getBtnAtacar() { return btnAtacar; }
+
 
     public void setImagenCelda(int x, int y, ImageIcon icon) {
         celdas[x][y].setIcon(icon);
@@ -154,6 +245,10 @@ public class VistaJuego extends JFrame {
             for (int j = 0; j < 10; j++)
                 celdas[i][j].setIcon(null);
     }
+    public void limpiarCelda(int fila, int columna) {
+        celdas[fila][columna].setIcon(null);
+    }
+
 
     public void setConsolaTexto(String texto) {
         areaTexto.setText(texto);
@@ -187,4 +282,5 @@ public class VistaJuego extends JFrame {
             return null;
         }
     }
+    
 }

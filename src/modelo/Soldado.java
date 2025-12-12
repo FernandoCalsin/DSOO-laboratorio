@@ -13,6 +13,8 @@ public class Soldado implements Serializable{
     private int fila;
     private int columna;
     private int ejercito;
+    
+
 
     public Soldado(String nombre, int fila, int columna, int ejercito) {
         Random rand = new Random();
@@ -54,6 +56,12 @@ public class Soldado implements Serializable{
     public int getNivelDefensa() {return this.nivelDefensa;}
     public int getNivelAtaque(){return this.nivelAtaque;}
     public int getNivelVida(){return this.nivelVida;}
+
+    public void setFila(int fila) {this.fila = fila;}
+    public void setColumna(int columna) {this.columna = columna;}
+
+    public void setEjercito(int ejercito) {this.ejercito = ejercito;}
+    public void setNombre(String nombre) {this.nombre = nombre;}
 
     public void atacar() {
         this.actitud = "Ofensiva";

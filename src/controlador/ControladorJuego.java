@@ -1,5 +1,6 @@
 package controlador;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,6 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import javax.swing.*;
 import modelo.*;
@@ -28,6 +31,86 @@ public class ControladorJuego {
     private ImageIcon imgCabDesmontado;
 
     private ArrayList<Soldado> listaSoldados = new ArrayList<>();
+    private final Color COLOR_AZUL = new Color(50, 50, 255);
+    private final Color COLOR_ROJO = new Color(255, 50, 50);
+
+
+    private Soldado soldadoSeleccionado = null;
+
+    public void seleccionarSoldado(int fila, int columna) {
+        for (Soldado s : listaSoldados) {
+            if (s.getFila() == fila && s.getColumna() == columna) {
+                soldadoSeleccionado = s;
+                vista.mostrarMensaje("Soldado seleccionado: " + s.getNombre());
+                return;
+            }
+        }
+        vista.mostrarMensaje("No hay soldado en esa posición.");
+    }
+
+    private void mover(int df, int dc) {
+        if (soldadoSeleccionado == null) {
+            vista.mostrarMensaje("Selecciona un soldado primero.");
+            return;
+        }
+        int nuevaFila = soldadoSeleccionado.getFila() + df;
+        int nuevaCol = soldadoSeleccionado.getColumna() + dc;
+
+        if (nuevaFila < 0 || nuevaFila >= 10 || nuevaCol < 0 || nuevaCol >= 10) {
+            vista.mostrarMensaje("Movimiento fuera del tablero.");
+            return;
+        }
+
+        for (Soldado s : listaSoldados) {
+            if (s.getFila() == nuevaFila && s.getColumna() == nuevaCol) {
+                vista.mostrarMensaje("Hay un soldado bloqueando el paso.");
+                return;
+            }
+        }
+        vista.limpiarCelda(soldadoSeleccionado.getFila(), soldadoSeleccionado.getColumna());
+    
+        soldadoSeleccionado.setFila(nuevaFila);
+        soldadoSeleccionado.setColumna(nuevaCol);
+        vista.setImagenCelda(nuevaFila, nuevaCol, obtenerImagenSoldado(soldadoSeleccionado));
+    }
+
+    public void atacar() {
+        if (soldadoSeleccionado == null) {
+            vista.mostrarMensaje("Selecciona un soldado primero.");
+            return;
+        }
+
+        int[][] dirs = { {-1,0}, {1,0}, {0,-1}, {0,1} };
+
+        for (int[] d : dirs) {
+            int f = soldadoSeleccionado.getFila() + d[0];
+            int c = soldadoSeleccionado.getColumna() + d[1];
+
+            for (Soldado enemigo : new ArrayList<>(listaSoldados)) {
+                if (enemigo != soldadoSeleccionado &&
+                    enemigo.getFila() == f &&
+                    enemigo.getColumna() == c) {
+
+                    int daño = soldadoSeleccionado.getNivelAtaque() - enemigo.getNivelDefensa();
+                    if (daño < 1) daño = 1;
+
+                    int nuevaVida = enemigo.getVidaActual() - daño;
+                    enemigo.setVidaActual(nuevaVida);
+
+                    if (nuevaVida <= 0) {
+                        vista.mostrarMensaje("¡" + enemigo.getNombre() + " murió!");
+                        vista.limpiarCelda(enemigo.getFila(), enemigo.getColumna());
+                        listaSoldados.remove(enemigo);
+                    } else {
+                        vista.mostrarMensaje("Hit: -" + daño + " (vida restante: " + nuevaVida + ")");
+                    }
+                    return;
+                }
+            }
+        }
+        vista.mostrarMensaje("No hay enemigos adyacentes.");
+    }
+
 
     public ControladorJuego(VistaJuego vista) {
         this.vista = vista;
@@ -36,6 +119,7 @@ public class ControladorJuego {
         crearCarpetaData();
         cargarImagenes();
         agregarEventos();
+        vista.crearPanelControles();
     }
 
     private void crearCarpetaData() {
@@ -65,6 +149,14 @@ public class ControladorJuego {
 
         vista.getItemGuardarBinario().addActionListener(e -> guardarBinario(listaSoldados));
         vista.getItemAbrirBinario().addActionListener(e -> abrirBinario());
+
+        vista.getBtnArriba().addActionListener(e -> moverSoldado(0, -1));
+        vista.getBtnAbajo().addActionListener(e -> moverSoldado(0, 1));
+        vista.getBtnIzquierda().addActionListener(e -> moverSoldado(-1, 0));
+        vista.getBtnDerecha().addActionListener(e -> moverSoldado(1, 0));
+        vista.getBtnAtacar().addActionListener(e -> atacar());
+
+
     }
 
     public void guardarBinario(Object datos) {
@@ -200,49 +292,99 @@ public class ControladorJuego {
         vista.setConsolaTexto("");
         vista.mostrarMensaje("Juego reiniciado.");
     }
-
     public void generarEjercitos() {
         vista.limpiarTablero();
-        Ejercito e1 = new Ejercito("Inglaterra", 10);
-        Ejercito e2 = new Ejercito("Francia", 10);
+
+        Ejercito e1 = new Ejercito("Inglaterra", 10, 1);
+        Ejercito e2 = new Ejercito("Francia", 10, 2);
+
+        colocarSoldadosEnTablero(e1);
+        colocarSoldadosEnTablero(e2);
+
+        for (Soldado s : e1.getSoldados()) s.setEjercito(1);
+        for (Soldado s : e2.getSoldados()) s.setEjercito(2);
 
         StringBuilder sb = new StringBuilder();
         sb.append(mostrarDatos(e1));
         sb.append(mostrarDatos(e2));
 
-        colocarSoldadosEnTablero(e1);
-        colocarSoldadosEnTablero(e2);
-
         listaSoldados.clear();
         listaSoldados.addAll(e1.getSoldados());
         listaSoldados.addAll(e2.getSoldados());
 
+        Map<Soldado, ImageIcon> imagenes = new HashMap<>();
+        for (Soldado s : listaSoldados) {
+            imagenes.put(s, obtenerImagenSoldado(s));
+        }
+
         vista.setConsolaTexto(sb.toString());
+
+        vista.actualizarTablero(e1.getSoldados(), e2.getSoldados(), imagenes);
     }
 
     private void colocarSoldadosEnTablero(Ejercito ej) {
+        boolean[][] ocupado = new boolean[10][10];
+
         for (Soldado s : ej.getSoldados()) {
             int x, y;
             do {
                 x = rand.nextInt(10);
                 y = rand.nextInt(10);
-            } while (!vista.isCeldaVacia(x, y));
+            } while (ocupado[x][y]);
 
-            s.mover(x, y);
-            vista.setImagenCelda(x, y, obtenerImagenSoldado(s));
+            ocupado[x][y] = true;
+
+            s.setFila(x);
+            s.setColumna(y);
         }
     }
-
+    
     private ImageIcon obtenerImagenSoldado(Soldado s) {
-        if (s instanceof Arquero) return imgArquero;
-        if (s instanceof Espadachin) return imgEspadachin;
-        if (s instanceof Lancero) return imgLancero;
-
-        if (s instanceof Caballero) {
+        if (s == null) return null;
+        ImageIcon base = null;
+        if (s instanceof Arquero) {
+            base = imgArquero;
+        } else if (s instanceof Espadachin) {
+            base = imgEspadachin;
+        } else if (s instanceof Lancero) {
+            base = imgLancero;
+        } else if (s instanceof Caballero) {
             Caballero c = (Caballero) s;
-            return c.isEstaMontado() ? imgCabMontado : imgCabDesmontado;
+            base = c.isEstaMontado() ? imgCabMontado : imgCabDesmontado;
         }
-        return null;
+        if (base == null) return null;
+        Color colorEquipo = (s.getEjercito() == 1)
+                ? COLOR_AZUL
+                : COLOR_ROJO;
+        return vista.tintarImagen(base, colorEquipo);
+    }
+
+
+    private void moverSoldado(int dx, int dy) {
+        if (soldadoSeleccionado == null) {
+            vista.mostrarMensaje("No hay soldado seleccionado.");
+            return;
+        }
+
+        int nuevaFila = soldadoSeleccionado.getFila() + dy;
+        int nuevaCol = soldadoSeleccionado.getColumna() + dx;
+
+        if (nuevaFila < 0 || nuevaFila >= 10 || nuevaCol < 0 || nuevaCol >= 10) {
+            vista.mostrarMensaje("Movimiento fuera del tablero.");
+            return;
+        }   
+
+        if (!vista.isCeldaVacia(nuevaFila, nuevaCol)) {
+            vista.mostrarMensaje("La celda está ocupada.");
+            return;
+        }
+
+        vista.limpiarCelda(soldadoSeleccionado.getFila(), soldadoSeleccionado.getColumna());
+
+        soldadoSeleccionado.setFila(nuevaFila);
+        soldadoSeleccionado.setColumna(nuevaCol);
+
+        vista.setImagenCelda(nuevaFila, nuevaCol, obtenerImagenSoldado(soldadoSeleccionado));
     }
 
     private String mostrarDatos(Ejercito e) {
